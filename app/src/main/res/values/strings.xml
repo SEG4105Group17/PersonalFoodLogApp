@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">PersonalFoodLogApp</string>
+
+    <string name="manualCaptureFoodButtonText">Enter New Food</string>
+    <string name="captureFoodButtonText">Capture Food</string>
+    <string name="viewItemsButtonText">View Items</string>
+    <string name="caloriesText">Calories</string>
+    <string name="calorieCountText">[CURRENT]/[GOAL]</string>
+    <string name="editTargetButtonText">Edit Target</string>
+    <string name="dateText">[DATE]</string>
+
+
 </resources>
