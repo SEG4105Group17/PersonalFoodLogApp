@@ -1,4 +1,4 @@
-package com.example.personalfoodlog
+package com.example.personalfoodlogapp
 
 import org.junit.Test
 
