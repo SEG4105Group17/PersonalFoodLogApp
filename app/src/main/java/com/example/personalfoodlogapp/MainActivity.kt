@@ -1,5 +1,6 @@
 package com.example.personalfoodlogapp
 
+import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.os.Environment
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -18,10 +20,15 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import java.io.File
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Date
 
 
 class MainActivity : AppCompatActivity() {
+    // For global variables
+    lateinit var globalApp: PersonalFoodApplication
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -32,11 +39,10 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        // TO BE IMPLEMENTED: Make the login/register screen the first thing to load
-
+        // Load the global data
+        globalApp = applicationContext as PersonalFoodApplication
         setDate()
-        // TO BE IMPLEMENTED: READ DATABASE AND SEND THE DATA HERE
-        setCalorieCounts(1,2)
+        updateCalorieCounts()
 
 
         // Calendar button moves to the calendar activity
@@ -44,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         calendarButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
                 startActivity(Intent(this@MainActivity, CalendarActivity::class.java))
+                finish()
             }
         })
 
@@ -53,6 +60,32 @@ class MainActivity : AppCompatActivity() {
         photoButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
                 invokeCamera()
+            }
+        })
+
+        // Target button opens the popup
+        val targetButton = findViewById<Button>(R.id.editTargetButton)
+        targetButton.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                val dialog = Dialog(this@MainActivity)
+                dialog.setContentView(R.layout.set_target_dialog)
+                dialog.setTitle("Set Target")
+                dialog.show()
+
+                // Confirm button runs the update target function
+                val confirmTarget = dialog.findViewById<Button>(R.id.confirmTargetButton)
+                confirmTarget.setOnClickListener(object : View.OnClickListener {
+                    override fun onClick(v: View?) {
+                        val calorieCount = dialog.findViewById<EditText>(R.id.calorieBox)
+                        var calorieCountText = calorieCount.text.toString()
+                        if (calorieCountText == "") {
+                            calorieCountText = "0"
+                        }
+                        setCalorieGoal(calorieCountText.toInt())
+                        dialog.dismiss()
+                    }
+                })
+
             }
         })
 
@@ -91,21 +124,25 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    private fun setCalorieGoal(calorieGoal: Int) {
+        // TO BE IMPLEMENTED: UPDATE VALUE ON SERVER
+        globalApp.calorieGoal = calorieGoal
+        updateCalorieCounts()
+    }
 
-
-    private fun setCalorieCounts(currentCalories: Int, goalCalories: Int){
+    private fun updateCalorieCounts(){
         val dateTextView = findViewById<TextView>(R.id.calorieCount)
-        dateTextView.setText(String.format("%d", currentCalories) + "/" + String.format("%d", goalCalories))
+        dateTextView.setText(String.format("%d", globalApp.calorieCurrent) + "/" + String.format("%d", globalApp.calorieGoal))
 
 
         val progressBar = findViewById<ProgressBar>(R.id.calorieProgressBar)
-        progressBar.setMax(goalCalories)
-        progressBar.setProgress(currentCalories)
+        progressBar.setMax(globalApp.calorieGoal)
+        progressBar.setProgress(globalApp.calorieCurrent)
     }
 
     private fun setDate() {
-        val sdf = SimpleDateFormat("MMM dd, yyyy")
-        val currentDate = sdf.format(Date())
+        val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
+        val currentDate = globalApp.currentDate.format(formatter)
 
         val dateTextView = findViewById<TextView>(R.id.dateText)
         dateTextView.setText(currentDate)
