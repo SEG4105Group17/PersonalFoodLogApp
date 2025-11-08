@@ -1,8 +1,11 @@
 package com.example.personalfoodlogapp
 
+import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -45,11 +48,66 @@ class ItemListActivity : AppCompatActivity(), ItemListAdapter.ClickListener {
     }
 
     override fun onEditClick(view: View?, position: Int) {
-        // TO BE IMPLEMENTED
+        val foodItem = globalApp.foodItems.get(position)
+
+        val dialog = Dialog(this@ItemListActivity)
+        dialog.setContentView(R.layout.set_item_grams)
+        dialog.setTitle("Set Grams")
+
+        val itemName = dialog.findViewById<TextView>(R.id.itemName)
+        itemName.text = foodItem.first
+
+        val confirmGramsButton = dialog.findViewById<Button>(R.id.confirmGramsButton)
+        confirmGramsButton.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                val gramBox = dialog.findViewById<EditText>(R.id.gramBox)
+                var gramBoxText = gramBox.text.toString()
+                if (gramBoxText != "") {
+                    setItemGrams(position,gramBoxText.toInt())
+                }
+                dialog.dismiss()
+            }
+        })
+
+        dialog.show()
     }
 
+    fun setItemGrams(position: Int, gramCount: Int) {
+        var foodItem = globalApp.foodItems.get(position)
+        val updatedFoodItem = foodItem.copy(first = foodItem.first, second = gramCount)
+
+        globalApp.foodItems.removeAt(position)
+        globalApp.foodItems.add(position, updatedFoodItem)
+
+        adapter.notifyItemChanged(position)
+        updateTotalMacro()
+    }
+
+
+
     override fun onViewClick(view: View?, position: Int) {
-        // TO BE IMPLEMENTED
+        val foodItem = globalApp.foodItems.get(position)
+
+        val dialog = Dialog(this@ItemListActivity)
+        dialog.setContentView(R.layout.view_item_dialog)
+        dialog.setTitle("View Item")
+
+        val itemName = dialog.findViewById<TextView>(R.id.itemName)
+        itemName.text = foodItem.first
+
+        val macros = globalApp.foodMacroMap.get(foodItem.first)
+        if (macros != null) {
+            val calValue = dialog.findViewById<TextView>(R.id.calValue)
+            calValue.setText("" + macros.get(0)*foodItem.second + "g")
+            val sodValue = dialog.findViewById<TextView>(R.id.sodValue)
+            sodValue.setText("" + macros.get(1)*foodItem.second + "g")
+            val fatValue = dialog.findViewById<TextView>(R.id.fatValue)
+            fatValue.setText("" + macros.get(2)*foodItem.second + "g")
+            val sugValue = dialog.findViewById<TextView>(R.id.sugValue)
+            sugValue.setText("" + macros.get(3)*foodItem.second + "g")
+        }
+
+        dialog.show()
     }
 
     fun updateTotalMacro() {
@@ -73,9 +131,9 @@ class ItemListActivity : AppCompatActivity(), ItemListAdapter.ClickListener {
             }
         })
 
-        calorie.setText("Total Calories: " + round(calorieTotal))
-        sodium.setText("Total Sodium: " + round(sodiumTotal))
-        fat.setText("Total Fat: " + round(fatTotal))
-        sugar.setText("Total Sugar: " + round(sugarTotal))
+        calorie.setText("Total Calories: " + round(calorieTotal) + "g")
+        sodium.setText("Total Sodium: " + round(sodiumTotal) + "g")
+        fat.setText("Total Fat: " + round(fatTotal) + "g")
+        sugar.setText("Total Sugar: " + round(sugarTotal) + "g")
     }
 }
