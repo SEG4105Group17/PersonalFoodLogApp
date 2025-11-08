@@ -3,6 +3,12 @@ package com.example.personalfoodlogapp;
 import android.app.Application;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import kotlin.Pair;
 
 public class PersonalFoodApplication extends Application {
 
@@ -18,6 +24,14 @@ public class PersonalFoodApplication extends Application {
     public LocalDate currentDate;
     public int calorieGoal;
     public int calorieCurrent;
+    public ArrayList<Pair<String, Integer>> foodItems;
+
+    // Table of macros... Listed per gram (Calorie, Sodium, Fat, Sugar)
+    public Map<String, ArrayList<Double>> foodMacroMap = new HashMap<>() {{
+        put("Potato", new ArrayList<>(Arrays.asList(0.77, 0.00003, 0.0013, 0.005)));
+        put("Tomato", new ArrayList<>(Arrays.asList(0.18, 0.00005, 0.002, 0.026)));
+        put("Lettuce", new ArrayList<>(Arrays.asList(0.15, 0.0003, 0.001, 0.012)));
+    }};
 
     public void onCreate() {
         super.onCreate();
@@ -36,6 +50,11 @@ public class PersonalFoodApplication extends Application {
 
         // TO BE IMPLEMENTED: READ DATABASE FOR DATA ON THIS DATE
         // Fake data
+        foodItems = new ArrayList<>();
+        foodItems.add(new Pair<>("Potato", 400));
+        foodItems.add(new Pair<>("Tomato", 200));
+        foodItems.add(new Pair<>("Lettuce", 500));
+
         monthlyGoalsMet = 5;
         calorieGoal = 1;
         calorieCurrent = 0;

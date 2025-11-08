@@ -85,7 +85,14 @@ class MainActivity : AppCompatActivity() {
                         dialog.dismiss()
                     }
                 })
+            }
+        })
 
+        // Button to add food items manually
+        val enterFoodButton = findViewById<Button>(R.id.manualCaptureFoodButton)
+        enterFoodButton.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                startActivity(Intent(this@MainActivity, ItemListActivity::class.java))
             }
         })
 
