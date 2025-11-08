@@ -62,7 +62,7 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp">
+            android:layout_height="150dp">
 
             <ProgressBar
                 android:id="@+id/calorieProgressBar"
@@ -96,17 +96,21 @@
         </FrameLayout>
 
         <Button
+            android:id="@+id/editTargetButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/editTargetButtonText"
+            android:layout_gravity="center_horizontal"/>
+
+        <Button
             android:id="@+id/captureFoodButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/captureFoodButtonText"
-            android:layout_gravity="center_horizontal"/>
-
-        <Button
-            android:id="@+id/manualCaptureFoodButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/manualCaptureFoodButtonText"
+            app:backgroundTint="@null"
+            android:layout_marginTop="20dp"
+            android:textSize="20dp"
+            android:background="@drawable/rainbow_background"
             android:layout_gravity="center_horizontal"/>
 
         <Button
@@ -114,14 +118,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/viewItemsButtonText"
+            app:backgroundTint="@null"
+            android:layout_marginTop="10dp"
+            android:textSize="20dp"
+            android:background="@drawable/rainbow_background"
             android:layout_gravity="center_horizontal"/>
 
-        <Button
-            android:id="@+id/editTargetButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/editTargetButtonText"
-            android:layout_gravity="center_horizontal"/>
+
 
     </LinearLayout>
 

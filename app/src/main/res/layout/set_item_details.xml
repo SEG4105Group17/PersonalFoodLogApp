@@ -15,12 +15,27 @@
         >
 
         <TextView
-            android:id="@+id/itemName"
+            android:id="@+id/instructionText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Item Name"
+            android:text="Edit Item"
             android:textSize="32dp"
             android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Item Name:"
+            android:textSize="20dp"/>
+
+        <AutoCompleteTextView
+            android:id="@+id/itemNameAutocomplete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="20dp"
+            android:layout_marginBottom="20dp"/>
 
         <TextView
             android:id="@+id/textView3"
@@ -34,10 +49,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:text=""
             android:inputType="number" />
 
         <Button
-            android:id="@+id/confirmGramsButton"
+            android:id="@+id/confirmItemButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Confirm"

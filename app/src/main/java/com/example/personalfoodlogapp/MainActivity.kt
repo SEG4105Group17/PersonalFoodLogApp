@@ -89,10 +89,11 @@ class MainActivity : AppCompatActivity() {
         })
 
         // Button to add food items manually
-        val enterFoodButton = findViewById<Button>(R.id.manualCaptureFoodButton)
+        val enterFoodButton = findViewById<Button>(R.id.viewItemsButton)
         enterFoodButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
                 startActivity(Intent(this@MainActivity, ItemListActivity::class.java))
+                finish()
             }
         })
 
@@ -132,19 +133,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setCalorieGoal(calorieGoal: Int) {
-        // TO BE IMPLEMENTED: UPDATE VALUE ON SERVER
         globalApp.calorieGoal = calorieGoal
+        globalApp.sendDataToServer(globalApp.currentDate)
         updateCalorieCounts()
     }
 
     private fun updateCalorieCounts(){
         val dateTextView = findViewById<TextView>(R.id.calorieCount)
-        dateTextView.setText(String.format("%d", globalApp.calorieCurrent) + "/" + String.format("%d", globalApp.calorieGoal))
+        dateTextView.setText(String.format("%d", globalApp.getCalorieCurrent()) + "/" + String.format("%d", globalApp.calorieGoal))
 
 
         val progressBar = findViewById<ProgressBar>(R.id.calorieProgressBar)
         progressBar.setMax(globalApp.calorieGoal)
-        progressBar.setProgress(globalApp.calorieCurrent)
+        progressBar.setProgress(globalApp.getCalorieCurrent())
     }
 
     private fun setDate() {

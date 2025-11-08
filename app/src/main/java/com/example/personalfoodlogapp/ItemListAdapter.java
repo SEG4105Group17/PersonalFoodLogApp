@@ -6,10 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import kotlin.Pair;
@@ -18,14 +20,15 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ViewHo
 
     private List<Pair<String,Integer>> mData;
     private LayoutInflater mInflater;
+    private ArrayList<String> validItemNames;
 
     private ClickListener listener;
 
-
     // data is passed into the constructor
-    ItemListAdapter(Context context, List<Pair<String,Integer>> data) {
+    ItemListAdapter(Context context, List<Pair<String,Integer>> data, ArrayList<String> validItemNames) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
+        this.validItemNames = validItemNames;
     }
 
     // inflates the row layout from xml when needed
@@ -41,6 +44,11 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ViewHo
         Pair<String,Integer> food = mData.get(position);
         holder.itemNameView.setText(food.getFirst());
         holder.calorieView.setText(String.valueOf(food.getSecond()) + " Grams");
+
+        // Highlight red if invalid item
+        if (!validItemNames.contains(holder.itemNameView.getText().toString())) {
+            holder.itemBackground.setBackgroundColor(0xFFFFBBBB);
+        }
     }
 
     // total number of rows
@@ -59,10 +67,13 @@ public class ItemListAdapter extends RecyclerView.Adapter<ItemListAdapter.ViewHo
         TextView itemNameView;
         TextView calorieView;
 
+        LinearLayout itemBackground;
+
         ViewHolder(View itemView) {
             super(itemView);
             itemNameView = itemView.findViewById(R.id.itemName);
             calorieView = itemView.findViewById(R.id.itemCalorie);
+            itemBackground = itemView.findViewById(R.id.itemBackground);
 
             // Add item manipulation buttons
             ImageButton itemRemoveButton = itemView.findViewById(R.id.removeItemButton);

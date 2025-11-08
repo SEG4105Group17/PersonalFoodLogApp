@@ -23,7 +23,6 @@ public class PersonalFoodApplication extends Application {
     // This data depends on the selected date
     public LocalDate currentDate;
     public int calorieGoal;
-    public int calorieCurrent;
     public ArrayList<Pair<String, Integer>> foodItems;
 
     // Table of macros... Listed per gram (Calorie, Sodium, Fat, Sugar)
@@ -43,6 +42,17 @@ public class PersonalFoodApplication extends Application {
         }
     }
 
+    public int getCalorieCurrent() {
+        // Calculate total calorie
+        double calorieTotal = 0.0;
+        for (Pair<String, Integer> item: foodItems) {
+            ArrayList<Double> macros = foodMacroMap.get(item.getFirst());
+            if (macros != null) {
+                calorieTotal += macros.get(0)*item.getSecond();
+            }
+        }
+        return (int)calorieTotal;
+    }
 
     public void getDataFromServer(LocalDate desiredDataDate) {
         currentDate = desiredDataDate;
@@ -56,8 +66,11 @@ public class PersonalFoodApplication extends Application {
         foodItems.add(new Pair<>("Lettuce", 500));
 
         monthlyGoalsMet = 5;
-        calorieGoal = 1;
-        calorieCurrent = 0;
+        calorieGoal = 1000;
+    }
+
+    public void sendDataToServer(LocalDate desiredDataDate) {
+        // TO BE IMPLEMENTED
     }
 
 }
