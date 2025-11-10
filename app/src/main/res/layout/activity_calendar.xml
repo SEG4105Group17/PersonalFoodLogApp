@@ -19,11 +19,11 @@
             android:id="@+id/textView2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Monthly Goals Complete"
+            android:text="Calorie Goal Progress"
             android:textSize="30dp"/>
 
         <TextView
-            android:id="@+id/goalsCompleteText"
+            android:id="@+id/progressBarText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="[COMPLETE]/[POSSIBLE]" />

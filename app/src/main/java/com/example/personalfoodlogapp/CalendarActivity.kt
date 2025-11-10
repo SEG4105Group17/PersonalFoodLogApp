@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 
 class CalendarActivity : AppCompatActivity() {
@@ -30,9 +29,8 @@ class CalendarActivity : AppCompatActivity() {
         }
 
         globalApp = applicationContext as PersonalFoodApplication
-        // The calendar screen will always have data from the current date
-        globalApp.getDataFromServer(LocalDate.now()) {
-            updateGoalsBar()
+        globalApp.getDailyGoalsData {
+            updateGoalsBar(globalApp.currentDate.year,globalApp.currentDate.month.value,globalApp.currentDate.dayOfMonth)
         }
 
         // Make the calendar actually update when the user clicks
@@ -42,8 +40,10 @@ class CalendarActivity : AppCompatActivity() {
                 set(year, month, dayOfMonth)
             }.timeInMillis
             calendarView.date = selectedTimeInMillis
-        }
 
+            // Update the goals bar for the selected date
+            updateGoalsBar(year, month, dayOfMonth)
+        }
 
         // Date confirm button - returns to main activity after loading the new data
         val dateButton = findViewById<Button>(R.id.changeDateButton)
@@ -60,14 +60,19 @@ class CalendarActivity : AppCompatActivity() {
 
     }
 
-    fun updateGoalsBar() {
-        val goalTextView = findViewById<TextView>(R.id.goalsCompleteText)
-        goalTextView.setText(String.format("%d", globalApp.monthlyGoalsMet) + "/" + String.format("%d", globalApp.monthlyGoalsPossible))
+    fun updateGoalsBar(year: Int, month: Int, dayOfMonth: Int) {
+        var dayGoals = globalApp.dailyCalorieGoals.get(String.format("%04d-%02d-%02d", year, month+1, dayOfMonth))
 
+        if (dayGoals == null) {
+            dayGoals = Pair(0,0)
+        }
+
+        val goalTextView = findViewById<TextView>(R.id.progressBarText)
+        goalTextView.setText(String.format("%d", dayGoals.first) + "/" + String.format("%d", dayGoals.second))
 
         val progressBar = findViewById<ProgressBar>(R.id.goalsProgressBar)
-        progressBar.setMax(globalApp.monthlyGoalsPossible)
-        progressBar.setProgress(globalApp.monthlyGoalsMet)
+        progressBar.setMax(dayGoals.second)
+        progressBar.setProgress(dayGoals.first)
 
     }
 }

@@ -8,6 +8,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,12 +22,11 @@ import kotlin.Pair;
 
 public class PersonalFoodApplication extends Application {
 
-    // These are the same irrespective of the selected date
-    public int monthlyGoalsMet;
-    public int monthlyGoalsPossible;
-
     private FirebaseFirestore db;
     private FirebaseAuth auth;
+
+    // Map of calorie goals for every date
+    public Map<String, Pair<Integer, Integer>> dailyCalorieGoals;
 
 
     // Table of macros... Listed per gram (Calorie, Sodium, Fat, Sugar)
@@ -63,7 +64,6 @@ public class PersonalFoodApplication extends Application {
 
     public void getDataFromServer(LocalDate desiredDataDate, MyCallback callback) {
         currentDate = desiredDataDate;
-        monthlyGoalsPossible = currentDate.getDayOfMonth();
         foodItems = new ArrayList<>();
 
         FirebaseUser user = auth.getCurrentUser();
@@ -77,8 +77,6 @@ public class PersonalFoodApplication extends Application {
             databaseError("Failed to get data from server. Check if you are logged in");
         }
 
-        // TO BE IMPLEMENTED: Calculate this value
-        monthlyGoalsMet = 5;
     }
 
     public void dataRetrieveSuccess(DocumentSnapshot documentSnapshot, MyCallback callback) {
@@ -113,18 +111,16 @@ public class PersonalFoodApplication extends Application {
         }
 
         callback.onSuccess();
-
-        // Do an advanced query to find the number of calorie goals met per month
     }
 
     public interface MyCallback {
         void onSuccess();
     }
 
-    public void attemptLogin(String email, String password, MyCallback callback) {
+    public void attemptLogin(String email, String password, MyCallback callback, MyCallback failCallback) {
         auth.signInWithEmailAndPassword(email, password)
                 .addOnSuccessListener(authResult -> callback.onSuccess())
-                .addOnFailureListener(e -> databaseError("Failed to login"));
+                .addOnFailureListener(e -> failCallback.onSuccess());
     }
 
     public void databaseError(String e) {
@@ -138,6 +134,11 @@ public class PersonalFoodApplication extends Application {
         dataHashmap.put("calorieGoal", calorieGoal);
         dataHashmap.put("foodItems", foodItems);
 
+        // Add the current calorie count, just so its easy to query later
+        int calorieCurrent = getCalorieCurrent();
+        dataHashmap.put("calorieCurrent", getCalorieCurrent());
+
+
         // Send data to server under the user's account
         FirebaseUser user = auth.getCurrentUser();
         if (user != null) {
@@ -148,6 +149,37 @@ public class PersonalFoodApplication extends Application {
         } else {
             databaseError("Failed to send data to server. Check if you are logged in");
         }
+    }
+
+    public void parseDailyGoals(QuerySnapshot querySnap, MyCallback callback) {
+        dailyCalorieGoals = new HashMap<>();
+        for (QueryDocumentSnapshot doc : querySnap) {
+            Double calorieCurrent = doc.getDouble("calorieCurrent");
+            Double calorieGoal = doc.getDouble("calorieGoal");
+            if (calorieCurrent == null) {
+                calorieCurrent = 0.0;
+            }
+            if (calorieGoal == null) {
+                calorieGoal = 0.0;
+            }
+            dailyCalorieGoals.put(doc.getId(), new Pair<>(calorieCurrent.intValue(), calorieGoal.intValue()));
+        }
+
+        callback.onSuccess();
+    }
+
+    public void getDailyGoalsData(MyCallback callback) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user != null) {
+            db
+                    .collection("users").document(user.getUid())
+                    .collection("date")
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> parseDailyGoals(documentSnapshot, callback));
+        } else {
+            databaseError("Failed to get data from server. Check if you are logged in");
+        }
+
     }
 
     public void useAIFoodDetection() {

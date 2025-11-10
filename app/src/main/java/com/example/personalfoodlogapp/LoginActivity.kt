@@ -1,11 +1,14 @@
 package com.example.personalfoodlogapp
 
+import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -35,14 +38,24 @@ class LoginActivity : AppCompatActivity() {
             override fun onClick(v: View?) {
                 globalApp.attemptLogin(
                     emailBox.text.toString(),
-                    passwordBox.text.toString()
-                ) {
-                    globalApp.getDataFromServer(globalApp.currentDate) {
+                    passwordBox.text.toString(),
+                    {globalApp.getDataFromServer(globalApp.currentDate) {
                         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                    }
-                }
+                    }},
+                    {showLoginFailDialog()}
+                )
             }
         })
+    }
+
+    fun showLoginFailDialog() {
+        // Create the dialog
+        val dialogBuilder = AlertDialog.Builder(this@LoginActivity)
+        dialogBuilder.setMessage("Please try again with valid credentials")
+        dialogBuilder.setTitle("Login Failed")
+
+        val dialog = dialogBuilder.create()
+        dialog.show()
     }
 
 }
