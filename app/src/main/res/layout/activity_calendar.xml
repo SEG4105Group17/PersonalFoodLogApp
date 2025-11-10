@@ -19,7 +19,7 @@
             android:id="@+id/textView2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Goals Complete"
+            android:text="Monthly Goals Complete"
             android:textSize="30dp"/>
 
         <TextView

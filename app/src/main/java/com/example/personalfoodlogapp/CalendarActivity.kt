@@ -31,10 +31,9 @@ class CalendarActivity : AppCompatActivity() {
 
         globalApp = applicationContext as PersonalFoodApplication
         // The calendar screen will always have data from the current date
-        globalApp.getDataFromServer(LocalDate.now())
-
-        updateGoalsBar()
-
+        globalApp.getDataFromServer(LocalDate.now()) {
+            updateGoalsBar()
+        }
 
         // Make the calendar actually update when the user clicks
         val calendarView = findViewById<CalendarView>(R.id.calendar)
@@ -51,9 +50,10 @@ class CalendarActivity : AppCompatActivity() {
         dateButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
                 val calendarView = findViewById<CalendarView>(R.id.calendar)
-                globalApp.getDataFromServer(Instant.ofEpochMilli(calendarView.date).atZone(ZoneId.systemDefault()).toLocalDate())
-                startActivity(Intent(this@CalendarActivity, MainActivity::class.java))
-                finish()
+                globalApp.getDataFromServer(Instant.ofEpochMilli(calendarView.date).atZone(ZoneId.systemDefault()).toLocalDate()) {
+                    startActivity(Intent(this@CalendarActivity, MainActivity::class.java))
+                    finish()
+                }
             }
         })
 

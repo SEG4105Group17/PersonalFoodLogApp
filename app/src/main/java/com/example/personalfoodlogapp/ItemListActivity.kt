@@ -73,7 +73,6 @@ class ItemListActivity : AppCompatActivity(), ItemListAdapter.ClickListener {
     }
 
     fun setItem(position: Int?, foodItem: String, gramCount: Int) {
-
         val updatedFoodItem = Pair<String, Int>(first = foodItem, second = gramCount)
 
         if (position != null) {

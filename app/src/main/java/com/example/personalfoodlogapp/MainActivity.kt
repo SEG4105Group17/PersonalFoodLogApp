@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
 
         // Load the global data
         globalApp = applicationContext as PersonalFoodApplication
-        setDate()
+        setDateText()
         updateCalorieCounts()
 
 
@@ -148,7 +148,7 @@ class MainActivity : AppCompatActivity() {
         progressBar.setProgress(globalApp.getCalorieCurrent())
     }
 
-    private fun setDate() {
+    private fun setDateText() {
         val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
         val currentDate = globalApp.currentDate.format(formatter)
 
