@@ -64,6 +64,7 @@ class ItemListActivity : AppCompatActivity(), ItemListAdapter.ClickListener {
 
     override fun onDeleteClick(view: View, position: Int) {
         globalApp.foodItems.removeAt(position)
+        globalApp.sendDataToServer(globalApp.currentDate)
         adapter.notifyItemRemoved(position)
         updateTotalMacro()
     }

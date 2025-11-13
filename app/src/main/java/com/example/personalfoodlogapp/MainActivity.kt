@@ -1,5 +1,6 @@
 package com.example.personalfoodlogapp
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
@@ -20,7 +21,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import java.io.File
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Date
 
@@ -43,7 +43,6 @@ class MainActivity : AppCompatActivity() {
         globalApp = applicationContext as PersonalFoodApplication
         setDateText()
         updateCalorieCounts()
-
 
         // Calendar button moves to the calendar activity
         val calendarButton = findViewById<ImageButton>(R.id.calendarButton)
@@ -104,32 +103,59 @@ class MainActivity : AppCompatActivity() {
 
     // Uniform Resource Identifier
     private var uri: Uri? = null
-    // Variable that makes the phone take an image
+    private var fileName: String? = null
     private val getCameraImage = registerForActivityResult(ActivityResultContracts.TakePicture()) {
         success ->
         if (success) {
-            Log.i(null,"Image saved: $uri")
+            Log.i(null,"Image saved locally: $uri")
+            // Upon success, upload the image to the server
+            uploadToDatabase(uri, fileName)
         } else {
             Log.e(null,"ERROR: Image not saved")
         }
     }
     // Create image file, invoke taking picture, save picture to image file
     private fun invokeCamera() {
-        val file = createImageFile()
+        // Create image file
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val imageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        fileName = "PersonalFoodApp_${timestamp}"
+        val file = File.createTempFile(fileName, ".jpg", imageDirectory)
+
+        // Get URI for image file
         try {
             uri = FileProvider.getUriForFile(this, "com.example.personalfoodlogapp.fileprovider", file)
         } catch (e: Exception) {
             Log.e(null,"ERROR: ${e.message}")
         }
+
+        // Launch camera object
         getCameraImage.launch(uri)
     }
-    // Create an image file
-    private fun createImageFile() : File {
-        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val imageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(
-            "PersonalFoodApp_${timestamp}", ".jpg", imageDirectory
-        )
+    // Once picture has been saved, Upload the image to the database
+    private fun uploadToDatabase(uri: Uri?, fileName: String?) {
+        if (uri == null || fileName == null) {
+          return
+        }
+
+        globalApp.uploadImageToStorage(uri, fileName) {
+            runAIOnImage(fileName)
+        }
+    }
+    // After image has been uploaded, run the AI model
+    private fun runAIOnImage(fileName: String) {
+        globalApp.useAIFoodDetection(fileName) {
+            // Update the calorie goal
+            updateCalorieCounts()
+
+            // Once AI model has been run, throw success dialog
+            val dialogBuilder = AlertDialog.Builder(this@MainActivity)
+            dialogBuilder.setMessage("The image has been successfully scanned. \n Detected food items have been added to the item list")
+            dialogBuilder.setTitle("Success!")
+
+            val dialog = dialogBuilder.create()
+            dialog.show()
+        }
     }
 
     private fun setCalorieGoal(calorieGoal: Int) {

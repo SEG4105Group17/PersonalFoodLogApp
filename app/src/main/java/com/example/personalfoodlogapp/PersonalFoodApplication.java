@@ -1,6 +1,7 @@
 package com.example.personalfoodlogapp;
 
 import android.app.Application;
+import android.net.Uri;
 import android.util.Log;
 
 import com.google.firebase.FirebaseApp;
@@ -10,6 +11,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,6 +31,8 @@ public class PersonalFoodApplication extends Application {
 
     private FirebaseFirestore db;
     private FirebaseAuth auth;
+    private FirebaseFunctions func;
+    private FirebaseStorage store;
 
     // Map of calorie goals for every date
     public Map<String, Pair<Integer, Integer>> dailyCalorieGoals;
@@ -46,6 +55,8 @@ public class PersonalFoodApplication extends Application {
         FirebaseApp.initializeApp(this);
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+        func = FirebaseFunctions.getInstance();
+        store = FirebaseStorage.getInstance();
 
         currentDate = LocalDate.now();
     }
@@ -182,8 +193,62 @@ public class PersonalFoodApplication extends Application {
 
     }
 
-    public void useAIFoodDetection() {
-        // TO BE IMPLEMENTED: Run code on server
+    public void useAIFoodDetection(String fileName, MyCallback callback) {
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (fileName == null || currentUser == null) {
+            return;
+        }
+
+        Map<String, Object> inputData = new HashMap<>();
+        inputData.put("storagePath", "images/"+currentUser.getUid()+"/"+fileName);
+
+        func.getHttpsCallable("process_image").call(inputData)
+                .addOnSuccessListener(
+                result -> {
+                    Object outputData = result.getData();
+                    if (outputData instanceof Map) {
+                        Map<?,?> map = (Map<?, ?>) outputData;
+
+                        // For the proof of concept; the AI model returns 3 nonsense values...
+                        // We will assume that the data is good here, no type checking
+                        List<Number> resultData = (List<Number>) map.get("result");
+                        Log.i("","Data received from AI Model: "+resultData.get(0) +"|"+ resultData.get(1) +"|"+ resultData.get(2));
+
+                        // Convert the 3 nonsense values into a food item
+                        int foodItemIndex = resultData.get(0).intValue() % foodMacroMap.size();
+                        String foodItemName = (new ArrayList<String>(foodMacroMap.keySet())).get(foodItemIndex);
+                        foodItems.add(new Pair<>(foodItemName, resultData.get(1).intValue()));
+
+                        // Update the server data with these new items
+                        sendDataToServer(currentDate);
+
+                        callback.onSuccess();
+                    } else {
+                        Log.e("", "Error reading result from AI function");
+                    }
+                }).addOnFailureListener(
+                        result -> {
+                            Log.e("", "Error running AI function", result);
+                        }
+        );
+    }
+
+    public void uploadImageToStorage(Uri localUri, String fileName, MyCallback callback) {
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (localUri == null || fileName == null || currentUser == null) {
+            return;
+        }
+
+        StorageReference storageRef = store.getReference();
+        StorageReference imageRef = storageRef.child("images/"+currentUser.getUid()+"/"+fileName);
+        UploadTask uploadTask = imageRef.putFile(localUri);
+        uploadTask.addOnSuccessListener(uri -> {
+           String downloadUrl = uri.toString();
+           Log.i("", "File uploaded to firebase storage. URL: "+downloadUrl);
+            callback.onSuccess();
+        }).addOnFailureListener(e -> {
+            Log.e("", "Failed to upload image to firebase storage");
+        });
     }
 
 }
