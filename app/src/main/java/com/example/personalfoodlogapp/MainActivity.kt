@@ -2,6 +2,7 @@ package com.example.personalfoodlogapp
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -160,6 +161,11 @@ class MainActivity : AppCompatActivity() {
             val dialogBuilder = AlertDialog.Builder(this@MainActivity)
             dialogBuilder.setMessage("The image has been successfully scanned. \n Detected food items have been added to the item list")
             dialogBuilder.setTitle("Success!")
+            dialogBuilder.setPositiveButton("Go to Item list") {
+                dialog, _ ->
+                startActivity(Intent(this@MainActivity, ItemListActivity::class.java))
+                finish()
+            }
 
             val dialog = dialogBuilder.create()
             dialog.show()
