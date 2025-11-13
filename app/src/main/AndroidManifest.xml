@@ -12,28 +12,27 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PersonalFoodLogApp">
-
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
         <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ItemListActivity"
             android:exported="false" />
-
         <activity
             android:name=".CalendarActivity"
             android:exported="false" />
-
         <activity
             android:name=".MainActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false"></activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -44,7 +43,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
-
     </application>
 
 </manifest>

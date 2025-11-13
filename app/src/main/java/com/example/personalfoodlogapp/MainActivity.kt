@@ -54,13 +54,21 @@ class MainActivity : AppCompatActivity() {
         })
 
         // Photo button asks phone for a photo
-        // TO BE IMPLEMENTED: SEND THE PHOTO TO A DATABASE INSTEAD OF STORING IT LOCALLY
         val photoButton = findViewById<Button>(R.id.captureFoodButton)
         photoButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
                 invokeCamera()
             }
         })
+
+        // Exit button is just a back button
+        val exitButton = findViewById<ImageButton>(R.id.exitButton)
+        exitButton.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                onBackPressedDispatcher.onBackPressed()
+            }
+        })
+
 
         // Target button opens the popup
         val targetButton = findViewById<Button>(R.id.editTargetButton)

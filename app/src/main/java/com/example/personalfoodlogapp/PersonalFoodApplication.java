@@ -16,8 +16,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -134,8 +132,16 @@ public class PersonalFoodApplication extends Application {
                 .addOnFailureListener(e -> failCallback.onSuccess());
     }
 
+    public void attemptRegistration(String email, String password, MyCallback callback, MyCallback failCallback) {
+        auth.createUserWithEmailAndPassword(email, password)
+                .addOnSuccessListener(
+                task -> callback.onSuccess()
+                ).addOnFailureListener(
+                e -> failCallback.onSuccess()
+                );
+    }
+
     public void databaseError(String e) {
-        // TO BE IMPLEMENTED: Display error dialog
         Log.e("", e);
     }
 
@@ -146,7 +152,6 @@ public class PersonalFoodApplication extends Application {
         dataHashmap.put("foodItems", foodItems);
 
         // Add the current calorie count, just so its easy to query later
-        int calorieCurrent = getCalorieCurrent();
         dataHashmap.put("calorieCurrent", getCalorieCurrent());
 
 
