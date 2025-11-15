@@ -4,7 +4,7 @@ Proof of concept by Group 17
 
 For Graders:
 To run the app; download and run the APK file on your mobile device.
-"PersonalFoodLogApp\app\build\outputs\apk\debug\app-debug.apk"
+"AppBuild.apk"
 You may need to change your settings to allow unknown app downloads...
 
 
@@ -12,4 +12,4 @@ You may need to change your settings to allow unknown app downloads...
 For Developers: 
 To run the app; Build the project in android studio and use an android emulator.
 After editing cloud functions (/functions/main.py); run command firebase deploy.
-To regenerate the APK, use the Build menu.
+To regenerate the APK, use the Build menu and then replace "AppBuild.apk"
